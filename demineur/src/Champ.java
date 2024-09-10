@@ -47,6 +47,14 @@ public class Champ {
         return this.field[i][j];
     }
 
+    public int getHeight() {
+        return this.field.length;
+    }
+
+    public int getWidth() {
+        return this.field[0].length;
+    }
+
     public void endGame() {
         System.out.println("Game over!");
     }

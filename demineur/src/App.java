@@ -24,10 +24,11 @@ public class App extends JFrame{
         champ.display();
 
         //creation d'un JPanel
-        GUI gui = new GUI();
+        GUI gui = new GUI(champ);
         
         //affectation du JPanel dans la JFrame
         setContentPane(gui);
+
         pack();
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
