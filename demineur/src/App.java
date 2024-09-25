@@ -1,6 +1,4 @@
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 
 /**
  * App
@@ -10,28 +8,43 @@ import javax.swing.JLabel;
  *          This program prints "Hello, World!" to the console.
  */
 
-public class App extends JFrame{
+public class App extends JFrame {
     /**
      * Main method
      * 
      * @param args not used
      * @throws Exception it's not my problem
      */
+    Champ champ;
+    GUI gui;
+    int score = 0;
+    boolean gameStarted = false;
 
     App() {
-        Champ champ = new Champ();
+        champ = new Champ();
         champ.init(10, 10, 7);
-        champ.display();
+        gui = new GUI(this);
 
-        //creation d'un JPanel
-        GUI gui = new GUI(champ);
-        
-        //affectation du JPanel dans la JFrame
         setContentPane(gui);
-
         pack();
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    Champ getChamp() {
+        return champ;
+    }
+
+    GUI getGUI() {
+        return gui;
+    }
+
+    boolean getGameStarted() {
+        return gameStarted;
+    }
+
+    void setGameStarted(boolean val) {
+        this.gameStarted = val;
     }
 
     public static void main(String[] args) throws Exception {

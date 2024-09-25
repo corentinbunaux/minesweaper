@@ -1,6 +1,8 @@
 public class Champ {
     private int[][] field;
     int nbOfMines;
+    private int[] sizes = { 10, 15, 20 };
+    private int[] tabMines = { 5, 10, 15 };
 
     public Champ() {
     }
@@ -20,8 +22,8 @@ public class Champ {
         }
     }
 
+    // initialise la grille avec uniquement des 0
     public void init(int i, int j, int nbOfMines) {
-        // init field
         this.field = new int[i][j];
         this.nbOfMines = nbOfMines;
         for (int k = 0; k < this.field.length; k++) {
@@ -29,13 +31,15 @@ public class Champ {
                 this.field[k][l] = 0;
             }
         }
+    }
 
-        // place mines
+    // Fait apparaitre des mines
+    public void spawnMines(int dimX, int dimY, int xClick, int yClick) {
         int cpt = nbOfMines;
         while (cpt > 0) {
-            int x = (int) (Math.random() * i);
-            int y = (int) (Math.random() * j);
-            if (this.field[x][y] != -1) {
+            int x = (int) (Math.random() * dimX);
+            int y = (int) (Math.random() * dimY);
+            if (this.field[x][y] != -1 && x != xClick && y != yClick) {
                 this.field[x][y] = -1;
                 this.increseNeighbours(x, y);
                 cpt--;
@@ -68,5 +72,24 @@ public class Champ {
                 }
             }
         }
+    }
+
+    public void dimensionsNewGame(String level) {
+        if (level.equals("Facile")) {
+            this.field = new int[sizes[0]][sizes[0]];
+            this.nbOfMines = tabMines[0];
+
+        } else if (level.equals("Moyen")) {
+            this.field = new int[sizes[1]][sizes[1]];
+            this.nbOfMines = tabMines[1];
+
+        } else if (level.equals("Difficile")) {
+            this.field = new int[sizes[2]][sizes[2]];
+            this.nbOfMines = tabMines[2];
+        }
+    }
+
+    int[] getSizes() {
+        return sizes;
     }
 }
