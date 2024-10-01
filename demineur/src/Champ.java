@@ -3,10 +3,8 @@ public class Champ {
     int nbOfMines;
     private int[] sizes = { 10, 15, 20 };
     private int[] tabMines = { 5, 10, 15 };
-    private App app;
 
-    public Champ(App app) {
-        this.app = app;
+    public Champ() {
     }
 
     public void display() {
@@ -28,6 +26,10 @@ public class Champ {
     public void init(int i, int j, int nbOfMines) {
         this.field = new int[i][j];
         this.nbOfMines = nbOfMines;
+        resetField();
+    }
+
+    public void resetField() {
         for (int k = 0; k < this.field.length; k++) {
             for (int l = 0; l < this.field[0].length; l++) {
                 this.field[k][l] = 0;
@@ -76,20 +78,20 @@ public class Champ {
         }
     }
 
-    public void dimensionsNewGame(String level) {
-        if (level.equals("Facile")) {
-            this.field = new int[sizes[0]][sizes[0]];
-            this.nbOfMines = tabMines[0];
+    // public void dimensionsNewGame(String level) {
+    // if (level.equals("Facile")) {
+    // this.field = new int[sizes[0]][sizes[0]];
+    // this.nbOfMines = tabMines[0];
 
-        } else if (level.equals("Moyen")) {
-            this.field = new int[sizes[1]][sizes[1]];
-            this.nbOfMines = tabMines[1];
+    // } else if (level.equals("Moyen")) {
+    // this.field = new int[sizes[1]][sizes[1]];
+    // this.nbOfMines = tabMines[1];
 
-        } else if (level.equals("Difficile")) {
-            this.field = new int[sizes[2]][sizes[2]];
-            this.nbOfMines = tabMines[2];
-        }
-    }
+    // } else if (level.equals("Difficile")) {
+    // this.field = new int[sizes[2]][sizes[2]];
+    // this.nbOfMines = tabMines[2];
+    // }
+    // }
 
     int[] getSizes() {
         return sizes;

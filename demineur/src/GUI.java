@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import javax.swing.JTextField;
+import java.awt.FlowLayout;
 
 /**
  * Graphical user Inferface
@@ -22,6 +24,7 @@ public class GUI extends JPanel {
     private String selectedLevel = "Facile";
     JPanel panelTop, panelMines, panelBottom;
     JLabel labelScore;
+    JTextField textField;
     Case[][] listCases;
 
     GUI(App app) {
@@ -29,6 +32,7 @@ public class GUI extends JPanel {
         panelMines = new JPanel();
         panelBottom = new JPanel();
         labelScore = new Compteur();
+        textField = new JTextField(10);
 
         setLayout(new GridLayout(0, 1));
         initMenu(app);
@@ -42,6 +46,14 @@ public class GUI extends JPanel {
     }
 
     void initPanelTop(App app) {
+        JPanel panelTop = new JPanel();
+        panelTop.setLayout(new FlowLayout());
+
+        JLabel labelName = new JLabel("Pseudo: ");
+        textField.setText("Anonyme");
+
+        panelTop.add(labelName);
+        panelTop.add(textField);
         panelTop.add(labelScore);
 
         // Niveaux de difficultés
@@ -50,13 +62,14 @@ public class GUI extends JPanel {
         comboBoxLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (GUI.this.selectedLevel != (String) comboBoxLevel.getSelectedItem()) {
+                if (!GUI.this.selectedLevel.equals(comboBoxLevel.getSelectedItem())) {
                     GUI.this.selectedLevel = (String) comboBoxLevel.getSelectedItem();
                     restartGame(app, selectedLevel);
                 }
             }
         });
         panelTop.add(comboBoxLevel);
+
         add(panelTop);
     }
 
@@ -106,8 +119,17 @@ public class GUI extends JPanel {
         JMenuBar menuBar = new JMenuBar();
         JMenu menuPartie = new JMenu("Partie");
         menuBar.add(menuPartie);
+        JMenuItem mMultijoueur = new JMenuItem("Multijoueur", KeyEvent.VK_M);
         JMenuItem mQuitter = new JMenuItem("Quitter", KeyEvent.VK_Q);
+        menuPartie.add(mMultijoueur);
         menuPartie.add(mQuitter);
+
+        mMultijoueur.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Client client = new Client(textField.getText(), app);
+            }
+        });
+
         mQuitter.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -117,10 +139,19 @@ public class GUI extends JPanel {
     }
 
     void restartGame(App app, String selectedLevel) {
-        GUI.this.score = 0;
         app.setGameStarted(false);
         panelMines.removeAll();
-        initPanelMines(app, selectedLevel);
+        app.getChamp().resetField();
+        // creation des JLabels pour les mines
+        for (int i = 0; i < app.getChamp().getSizes()[indexOf(selectedLevel)]; i++) {
+            for (int j = 0; j < app.getChamp().getSizes()[indexOf(selectedLevel)]; j++) {
+                Case labelMine;
+                labelMine = new Case(app, i, j);
+                panelMines.add(labelMine);
+                listCases[i][j] = labelMine;
+            }
+        }
+        add(panelMines);
         add(panelBottom);
         app.pack();
     }

@@ -17,11 +17,10 @@ public class App extends JFrame {
      */
     Champ champ;
     GUI gui;
-    int score = 0;
     boolean gameStarted = false;
 
     App() {
-        champ = new Champ(this);
+        champ = new Champ();
         champ.init(10, 10, 7);
         gui = new GUI(this);
 
