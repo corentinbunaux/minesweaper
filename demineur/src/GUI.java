@@ -157,15 +157,16 @@ public class GUI extends JPanel {
 
     void propagate(App app, int xCoord, int yCoord) {
         if (app.getChamp().getVal(xCoord, yCoord) != 0) {
-            // app.getGUI().getCase(xCoord, yCoord).setIsDiscovered(true);
+            app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true);
             return;
         } else {
-            app.getGUI().getCase(xCoord, yCoord).setIsDiscovered(true);
+            app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true);
 
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    if (i == 0 && j == 0)
+                    if (i == j) {
                         continue;
+                    }
 
                     int newX = xCoord + i;
                     int newY = yCoord + j;
@@ -174,12 +175,11 @@ public class GUI extends JPanel {
                             && newX < app.getChamp().getSizes()[app.getGUI().indexOf(app.getGUI().getSelectedLevel())]
                             && newY >= 0
                             && newY < app.getChamp().getSizes()[app.getGUI().indexOf(app.getGUI().getSelectedLevel())]
-                            && !app.getGUI().getCase(newX, newY).getIsDiscovered()) {
+                            && !app.getGUI().getCase(newY, newX).getIsDiscovered()) {
                         propagate(app, newX, newY);
                     }
                 }
             }
-            System.out.println("");
         }
     }
 }

@@ -55,14 +55,14 @@ public class Case extends JPanel implements MouseListener {
         }
 
         if (this.app.getChamp().getVal(xCase, yCase) == -1) {
-            txt = "*";
+            app.getChamp().endGame();
         } else {
             txt = Integer.toString(this.app.getChamp().getVal(xCase, yCase));
             if (this.app.getChamp().getVal(xCase, yCase) == 0) {
-                txt = " ";
                 app.getGUI().propagate(app, xCase, yCase);
             }
         }
+
         repaint();
     }
 
@@ -87,12 +87,18 @@ public class Case extends JPanel implements MouseListener {
         setBackground(null);
     }
 
-    boolean getIsDiscovered(){
+    boolean getIsDiscovered() {
         return this.isDiscovered;
     }
 
-    void setIsDiscovered(boolean val){
+    void setIsDiscovered(boolean val) {
         this.isDiscovered = val;
-        txt = Integer.toString(this.app.getChamp().getVal(xCase, yCase));
+        if (app.getChamp().getVal(xCase, yCase) == -1) {
+            txt = "*";
+        } else if (app.getChamp().getVal(xCase, yCase) == 0) {
+            txt = " ";
+        } else {
+            txt = Integer.toString(app.getChamp().getVal(xCase, yCase));
+        }
     }
 }
