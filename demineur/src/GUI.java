@@ -21,12 +21,14 @@ public class GUI extends JPanel {
     private String[] levels = { "Facile", "Moyen", "Difficile" };
     private String selectedLevel = "Facile";
     JPanel panelTop, panelMines, panelBottom;
+    JLabel labelScore;
     Case[][] listCases;
 
     GUI(App app) {
         panelTop = new JPanel();
         panelMines = new JPanel();
         panelBottom = new JPanel();
+        labelScore = new Compteur();
 
         setLayout(new GridLayout(0, 1));
         initMenu(app);
@@ -40,7 +42,6 @@ public class GUI extends JPanel {
     }
 
     void initPanelTop(App app) {
-        JLabel labelScore = new JLabel("Score : " + score);
         panelTop.add(labelScore);
 
         // Niveaux de difficultés
@@ -134,6 +135,10 @@ public class GUI extends JPanel {
 
     JPanel getPanelBottom() {
         return panelBottom;
+    }
+
+    JLabel getLabelScore() {
+        return labelScore;
     }
 
     int indexOf(String selectedLevel) {

@@ -3,8 +3,10 @@ public class Champ {
     int nbOfMines;
     private int[] sizes = { 10, 15, 20 };
     private int[] tabMines = { 5, 10, 15 };
+    private App app;
 
-    public Champ() {
+    public Champ(App app) {
+        this.app = app;
     }
 
     public void display() {

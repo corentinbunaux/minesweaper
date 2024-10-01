@@ -21,7 +21,7 @@ public class App extends JFrame {
     boolean gameStarted = false;
 
     App() {
-        champ = new Champ();
+        champ = new Champ(this);
         champ.init(10, 10, 7);
         gui = new GUI(this);
 
