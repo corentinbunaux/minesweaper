@@ -21,7 +21,7 @@ public class App extends JFrame {
 
     App() {
         champ = new Champ();
-        champ.init(10, 10, 7);
+        champ.init("Facile");
         gui = new GUI(this);
 
         setContentPane(gui);

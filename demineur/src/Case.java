@@ -41,10 +41,31 @@ public class Case extends JPanel implements MouseListener {
         int y = (getHeight() + textHeight) / 2;
         g.drawString(txt, x, y);
         if (isDiscovered) {
-            setBackground(Color.GREEN);
+            setBackground(Color.LIGHT_GRAY);
+            // setForegroundWhenDiscovered();
         }
         Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
         setBorder(border);
+    }
+
+    void setForegroundWhenDiscovered() {
+        if (this.txt == "1") {
+            this.setForeground(Color.BLUE);
+        } else if (this.txt == "2") {
+            this.setForeground(Color.GREEN);
+        } else if (this.txt == "3") {
+            this.setForeground(Color.RED);
+        } else if (this.txt == "4") {
+            this.setForeground(Color.YELLOW);
+        } else if (this.txt == "5") {
+            this.setForeground(Color.ORANGE);
+        } else if (this.txt == "6") {
+            this.setForeground(Color.PINK);
+        } else if (this.txt == "7") {
+            this.setForeground(Color.MAGENTA);
+        } else if (this.txt == "8") {
+            this.setForeground(Color.CYAN);
+        }
     }
 
     @Override
@@ -55,11 +76,15 @@ public class Case extends JPanel implements MouseListener {
         }
 
         if (this.app.getChamp().getVal(xCase, yCase) == -1) {
-            app.getChamp().endGame();
+            txt = "*";
+            app.getGUI().endGame(this.app, false);
+
         } else {
-            txt = Integer.toString(this.app.getChamp().getVal(xCase, yCase));
             if (this.app.getChamp().getVal(xCase, yCase) == 0) {
+                txt = " ";
                 app.getGUI().propagate(app, xCase, yCase);
+            } else {
+                txt = Integer.toString(this.app.getChamp().getVal(xCase, yCase));
             }
         }
 
@@ -68,18 +93,26 @@ public class Case extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        isDiscovered = true;
+        if (isDiscovered == false) {
+            isDiscovered = true;
+            this.app.getChamp().downgradeNbRemainingSpots();
+        }
+
         repaint();
+
+        if (this.app.getChamp().getNumberSafeRemaining() == 0) {
+            app.getGUI().endGame(this.app, true);
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        setBackground(Color.GREEN);
+        setBackground(Color.LIGHT_GRAY);
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        setBackground(Color.GRAY);
+        setBackground(Color.DARK_GRAY);
     }
 
     @Override
@@ -93,10 +126,10 @@ public class Case extends JPanel implements MouseListener {
 
     void setIsDiscovered(boolean val) {
         this.isDiscovered = val;
-        if (app.getChamp().getVal(xCase, yCase) == -1) {
-            txt = "*";
-        } else if (app.getChamp().getVal(xCase, yCase) == 0) {
+        if (app.getChamp().getVal(xCase, yCase) == 0) {
             txt = " ";
+        } else if (app.getChamp().getVal(xCase, yCase) == -1) {
+            txt = "*";
         } else {
             txt = Integer.toString(app.getChamp().getVal(xCase, yCase));
         }

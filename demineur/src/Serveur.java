@@ -23,8 +23,6 @@ class ClientHandler implements Runnable {
     private static int numJoueur = 0;
     private static Champ champ;
     private static String selectedLevel = "Facile";
-    private static int dimChamp = 10;
-    private static int nbOfMines = 7;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -39,7 +37,7 @@ class ClientHandler implements Runnable {
             DataOutputStream sortie = new DataOutputStream(socket.getOutputStream());
 
             champ = new Champ();
-            champ.init(dimChamp, dimChamp, nbOfMines);
+            champ.init(selectedLevel);
 
             // lecture d’une donnée
             String nomJoueur = entree.readUTF();

@@ -3,6 +3,7 @@ public class Champ {
     int nbOfMines;
     private int[] sizes = { 10, 15, 20 };
     private int[] tabMines = { 5, 10, 15 };
+    private int numberSafeRemaining;
 
     public Champ() {
     }
@@ -22,10 +23,20 @@ public class Champ {
         }
     }
 
-    // initialise la grille avec uniquement des 0
-    public void init(int i, int j, int nbOfMines) {
-        this.field = new int[i][j];
-        this.nbOfMines = nbOfMines;
+    void init(String selectedLevel) {
+        if (selectedLevel.equals("Facile")) {
+            this.field = new int[sizes[0]][sizes[0]];
+            this.nbOfMines = tabMines[0];
+
+        } else if (selectedLevel.equals("Moyen")) {
+            this.field = new int[sizes[1]][sizes[1]];
+            this.nbOfMines = tabMines[1];
+
+        } else if (selectedLevel.equals("Difficile")) {
+            this.field = new int[sizes[2]][sizes[2]];
+            this.nbOfMines = tabMines[2];
+        }
+        this.numberSafeRemaining = this.field.length * this.field[0].length - this.nbOfMines;
         resetField();
     }
 
@@ -35,6 +46,7 @@ public class Champ {
                 this.field[k][l] = 0;
             }
         }
+        this.numberSafeRemaining = this.field.length * this.field[0].length - this.nbOfMines;
     }
 
     // Fait apparaitre des mines
@@ -61,10 +73,6 @@ public class Champ {
 
     public int getWidth() {
         return this.field[0].length;
-    }
-
-    public void endGame() {
-        System.out.println("Game over!");
     }
 
     public void increseNeighbours(int x, int y) {
@@ -95,5 +103,13 @@ public class Champ {
 
     int[] getSizes() {
         return sizes;
+    }
+
+    void downgradeNbRemainingSpots() {
+        this.numberSafeRemaining--;
+    }
+
+    int getNumberSafeRemaining() {
+        return this.numberSafeRemaining;
     }
 }

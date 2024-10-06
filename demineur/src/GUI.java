@@ -1,3 +1,4 @@
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -13,6 +14,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import java.awt.FlowLayout;
+// import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  * Graphical user Inferface
@@ -69,7 +72,6 @@ public class GUI extends JPanel {
             }
         });
         panelTop.add(comboBoxLevel);
-
         add(panelTop);
     }
 
@@ -141,8 +143,14 @@ public class GUI extends JPanel {
     void restartGame(App app, String selectedLevel) {
         app.setGameStarted(false);
         panelMines.removeAll();
-        app.getChamp().resetField();
+        app.getChamp().init(selectedLevel);
+
+        panelMines.setLayout(new GridLayout(app.getChamp().getSizes()[indexOf(selectedLevel)],
+                app.getChamp().getSizes()[indexOf(selectedLevel)]));
         // creation des JLabels pour les mines
+        listCases = new Case[app.getChamp().getSizes()[indexOf(selectedLevel)]][app.getChamp()
+                .getSizes()[indexOf(selectedLevel)]];
+
         for (int i = 0; i < app.getChamp().getSizes()[indexOf(selectedLevel)]; i++) {
             for (int j = 0; j < app.getChamp().getSizes()[indexOf(selectedLevel)]; j++) {
                 Case labelMine;
@@ -192,6 +200,7 @@ public class GUI extends JPanel {
     }
 
     void propagate(App app, int xCoord, int yCoord) {
+        app.getChamp().downgradeNbRemainingSpots();
         if (app.getChamp().getVal(xCoord, yCoord) != 0) {
             app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true);
             return;
@@ -215,6 +224,40 @@ public class GUI extends JPanel {
                         propagate(app, newX, newY);
                     }
                 }
+            }
+        }
+    }
+
+    public void endGame(App app, boolean win) {
+        // ImageIcon icon = new ImageIcon("../img/test.png");
+
+        String[] options = { "Restart", "Exit" };
+        String message = win ? "You win ! " : "You lose... ";
+
+        revealAllGrid();
+
+        // Show the custom dialog
+        int choice = JOptionPane.showOptionDialog(
+                null,
+                message + "What would you like to do?",
+                "Game Over",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        if (choice == 0) {
+            restartGame(app, this.selectedLevel);
+        } else if (choice == 1) {
+            System.exit(0);
+        }
+    }
+
+    void revealAllGrid() {
+        for (int i = 0; i < listCases.length; i++) {
+            for (int j = 0; j < listCases[i].length; j++) {
+                listCases[i][j].setIsDiscovered(true);
             }
         }
     }
