@@ -201,6 +201,9 @@ public class GUI extends JPanel {
 
     void propagate(App app, int xCoord, int yCoord) {
         app.getChamp().downgradeNbRemainingSpots();
+        if (app.getGUI().getCase(yCoord, xCoord).getTxt() == "F") {
+            app.getChamp().incrementNbFlags();
+        }
         if (app.getChamp().getVal(xCoord, yCoord) != 0) {
             app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true);
             return;

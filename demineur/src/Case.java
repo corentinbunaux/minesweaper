@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.Color;
 import java.awt.FontMetrics;
-
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -42,49 +41,44 @@ public class Case extends JPanel implements MouseListener {
         g.drawString(txt, x, y);
         if (isDiscovered) {
             setBackground(Color.LIGHT_GRAY);
-            // setForegroundWhenDiscovered();
+            setForeground(Color.BLUE);
+            if (txt == "*") {
+                setBackground(Color.RED);
+            }
         }
         Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
         setBorder(border);
     }
 
-    void setForegroundWhenDiscovered() {
-        if (this.txt == "1") {
-            this.setForeground(Color.BLUE);
-        } else if (this.txt == "2") {
-            this.setForeground(Color.GREEN);
-        } else if (this.txt == "3") {
-            this.setForeground(Color.RED);
-        } else if (this.txt == "4") {
-            this.setForeground(Color.YELLOW);
-        } else if (this.txt == "5") {
-            this.setForeground(Color.ORANGE);
-        } else if (this.txt == "6") {
-            this.setForeground(Color.PINK);
-        } else if (this.txt == "7") {
-            this.setForeground(Color.MAGENTA);
-        } else if (this.txt == "8") {
-            this.setForeground(Color.CYAN);
-        }
-    }
-
     @Override
     public void mousePressed(MouseEvent e) {
-        if (!app.getGameStarted()) {
-            app.setGameStarted(true);
-            this.app.getChamp().spawnMines(app.getChamp().getHeight(), app.getChamp().getWidth(), xCase, yCase);
-        }
-
-        if (this.app.getChamp().getVal(xCase, yCase) == -1) {
-            txt = "*";
-            app.getGUI().endGame(this.app, false);
-
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            if (!isDiscovered & app.getChamp().getNbFlags() > 0) {
+                if (txt != "F") {
+                    txt = "F";
+                    app.getChamp().decrementNbFlags();
+                } else {
+                    txt = "";
+                    app.getChamp().incrementNbFlags();
+                }
+            }
         } else {
-            if (this.app.getChamp().getVal(xCase, yCase) == 0) {
-                txt = " ";
-                app.getGUI().propagate(app, xCase, yCase);
+            if (!app.getGameStarted()) {
+                app.setGameStarted(true);
+                this.app.getChamp().spawnMines(app.getChamp().getHeight(), app.getChamp().getWidth(), xCase, yCase);
+            }
+
+            if (this.app.getChamp().getVal(xCase, yCase) == -1) {
+                txt = "*";
+                app.getGUI().endGame(this.app, false);
+
             } else {
-                txt = Integer.toString(this.app.getChamp().getVal(xCase, yCase));
+                if (this.app.getChamp().getVal(xCase, yCase) == 0) {
+                    txt = " ";
+                    app.getGUI().propagate(app, xCase, yCase);
+                } else {
+                    txt = Integer.toString(this.app.getChamp().getVal(xCase, yCase));
+                }
             }
         }
 
@@ -93,7 +87,7 @@ public class Case extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (isDiscovered == false) {
+        if (isDiscovered == false & e.getButton() != MouseEvent.BUTTON3) {
             isDiscovered = true;
             this.app.getChamp().downgradeNbRemainingSpots();
         }
@@ -133,5 +127,9 @@ public class Case extends JPanel implements MouseListener {
         } else {
             txt = Integer.toString(app.getChamp().getVal(xCase, yCase));
         }
+    }
+
+    String getTxt() {
+        return txt;
     }
 }

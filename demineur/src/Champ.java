@@ -3,7 +3,7 @@ public class Champ {
     int nbOfMines;
     private int[] sizes = { 10, 15, 20 };
     private int[] tabMines = { 5, 10, 15 };
-    private int numberSafeRemaining;
+    private int numberSafeRemaining, nbOfFlags;
 
     public Champ() {
     }
@@ -37,6 +37,7 @@ public class Champ {
             this.nbOfMines = tabMines[2];
         }
         this.numberSafeRemaining = this.field.length * this.field[0].length - this.nbOfMines;
+        this.nbOfFlags = this.nbOfMines;
         resetField();
     }
 
@@ -47,6 +48,7 @@ public class Champ {
             }
         }
         this.numberSafeRemaining = this.field.length * this.field[0].length - this.nbOfMines;
+        this.nbOfFlags = this.nbOfMines;
     }
 
     // Fait apparaitre des mines
@@ -86,21 +88,6 @@ public class Champ {
         }
     }
 
-    // public void dimensionsNewGame(String level) {
-    // if (level.equals("Facile")) {
-    // this.field = new int[sizes[0]][sizes[0]];
-    // this.nbOfMines = tabMines[0];
-
-    // } else if (level.equals("Moyen")) {
-    // this.field = new int[sizes[1]][sizes[1]];
-    // this.nbOfMines = tabMines[1];
-
-    // } else if (level.equals("Difficile")) {
-    // this.field = new int[sizes[2]][sizes[2]];
-    // this.nbOfMines = tabMines[2];
-    // }
-    // }
-
     int[] getSizes() {
         return sizes;
     }
@@ -111,5 +98,19 @@ public class Champ {
 
     int getNumberSafeRemaining() {
         return this.numberSafeRemaining;
+    }
+
+    public int decrementNbFlags() {
+        System.out.println(this.nbOfFlags);
+        return this.nbOfFlags--;
+    }
+
+    public int incrementNbFlags() {
+        System.out.println(this.nbOfFlags);
+        return this.nbOfFlags++;
+    }
+
+    public int getNbFlags() {
+        return this.nbOfFlags;
     }
 }
