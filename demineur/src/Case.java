@@ -142,6 +142,10 @@ public class Case extends JPanel implements MouseListener {
                     }
                 }
             }
+
+            if (app.getChamp().getVal(xCase, yCase) != -1) {
+                app.getGUI().getLabelScore().setScore(app.getGUI().getLabelScore().getScore() + 1);
+            }
         }
     }
 

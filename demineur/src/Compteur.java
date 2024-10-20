@@ -30,7 +30,6 @@ public class Compteur extends JLabel implements Runnable {
 
     public void setGameStarted(boolean val) {
         this.gameStarted = val;
-        System.out.println("Game started");
     }
 
     public void run() {
@@ -57,5 +56,13 @@ public class Compteur extends JLabel implements Runnable {
 
     void stop() {
         processScores = null;
+    }
+
+    void setScore(int score) {
+        this.score = score;
+    }
+
+    int getScore() {
+        return this.score;
     }
 }

@@ -137,10 +137,20 @@ public class GUI extends JPanel {
         JMenuBar menuBar = new JMenuBar();
         JMenu menuPartie = new JMenu("Partie");
         menuBar.add(menuPartie);
+        JMenuItem mClassique = new JMenuItem("Classique", KeyEvent.VK_C);
         JMenuItem mMultijoueur = new JMenuItem("Multijoueur", KeyEvent.VK_M);
         JMenuItem mQuitter = new JMenuItem("Quitter", KeyEvent.VK_Q);
+        menuPartie.add(mClassique);
         menuPartie.add(mMultijoueur);
         menuPartie.add(mQuitter);
+
+        mClassique.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (app.getMultiplayerStatus() == true) {
+                    app.setMultiplayerStatus(false);
+                }
+            }
+        });
 
         mMultijoueur.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
