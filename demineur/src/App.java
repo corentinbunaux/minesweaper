@@ -18,6 +18,8 @@ public class App extends JFrame {
     Champ champ;
     GUI gui;
     boolean gameStarted = false;
+    boolean getMultiplayerStatus = false;
+    int numJoueur;
 
     App() {
         champ = new Champ();
@@ -44,6 +46,22 @@ public class App extends JFrame {
 
     void setGameStarted(boolean val) {
         this.gameStarted = val;
+    }
+
+    void setMultiplayerStatus(boolean val) {
+        this.getMultiplayerStatus = val;
+    }
+
+    boolean getMultiplayerStatus() {
+        return getMultiplayerStatus;
+    }
+
+    int getNumJoueur() {
+        return numJoueur;
+    }
+
+    void setNumJoueur(int numJoueur) {
+        this.numJoueur = numJoueur;
     }
 
     public static void main(String[] args) throws Exception {

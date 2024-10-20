@@ -1,21 +1,23 @@
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
+
 import java.awt.GridLayout;
 import java.awt.MenuBar;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
 import java.awt.FlowLayout;
-// import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
 
 /**
  * Graphical user Inferface
@@ -26,9 +28,11 @@ public class GUI extends JPanel {
     private String[] levels = { "Facile", "Moyen", "Difficile" };
     private String selectedLevel = "Facile";
     JPanel panelTop, panelMines, panelBottom;
-    JLabel labelScore;
+    Compteur labelScore;
     JTextField textField;
     Case[][] listCases;
+    List<Client> clients = new ArrayList<Client>();
+    JDialog pleaseWaitDialog;
 
     GUI(App app) {
         panelTop = new JPanel();
@@ -98,8 +102,20 @@ public class GUI extends JPanel {
     }
 
     void initPanelBottom(App app) {
-        JButton buttonRestart = new JButton("Recommencer");
-        JButton buttonQuit = new JButton("Quitter");
+        ImageIcon restartIcon = new ImageIcon("../ressources/restart.png");
+        ImageIcon quitIcon = new ImageIcon("../ressources/quit.png");
+
+        Dimension buttonSize = new Dimension(48, 48);
+        JButton buttonRestart = new JButton(restartIcon);
+        buttonRestart.setPreferredSize(buttonSize);
+        buttonRestart.setMinimumSize(buttonSize);
+        buttonRestart.setMaximumSize(buttonSize);
+
+        JButton buttonQuit = new JButton(quitIcon);
+        buttonQuit.setPreferredSize(buttonSize);
+        buttonQuit.setMinimumSize(buttonSize);
+        buttonQuit.setMaximumSize(buttonSize);
+
         buttonRestart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 restartGame(app, selectedLevel);
@@ -128,7 +144,12 @@ public class GUI extends JPanel {
 
         mMultijoueur.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (app.getMultiplayerStatus() == true) {
+                    return;
+                }
                 Client client = new Client(textField.getText(), app);
+                clients.add(client);
+                app.setMultiplayerStatus(true);
             }
         });
 
@@ -141,6 +162,8 @@ public class GUI extends JPanel {
     }
 
     void restartGame(App app, String selectedLevel) {
+        app.getGUI().getLabelScore().reinitScore();
+        app.getGUI().getLabelScore().setGameStarted(false);
         app.setGameStarted(false);
         panelMines.removeAll();
         app.getChamp().init(selectedLevel);
@@ -176,7 +199,7 @@ public class GUI extends JPanel {
         return panelBottom;
     }
 
-    JLabel getLabelScore() {
+    Compteur getLabelScore() {
         return labelScore;
     }
 
@@ -200,19 +223,22 @@ public class GUI extends JPanel {
     }
 
     void propagate(App app, int xCoord, int yCoord) {
+        if (app.getMultiplayerStatus() == true) {
+            return;
+        }
         app.getChamp().downgradeNbRemainingSpots();
         if (app.getGUI().getCase(yCoord, xCoord).getTxt() == "F") {
             app.getChamp().incrementNbFlags();
         }
         if (app.getChamp().getVal(xCoord, yCoord) != 0) {
-            app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true);
+            app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true, Color.LIGHT_GRAY);
             return;
         } else {
-            app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true);
+            app.getGUI().getCase(yCoord, xCoord).setIsDiscovered(true, Color.LIGHT_GRAY);
 
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    if (i == j) {
+                    if (i == j && i == 0) {
                         continue;
                     }
 
@@ -232,7 +258,7 @@ public class GUI extends JPanel {
     }
 
     public void endGame(App app, boolean win) {
-        // ImageIcon icon = new ImageIcon("../img/test.png");
+        app.getGUI().getLabelScore().setGameStarted(false);
 
         String[] options = { "Restart", "Exit" };
         String message = win ? "You win ! " : "You lose... ";
@@ -260,7 +286,71 @@ public class GUI extends JPanel {
     void revealAllGrid() {
         for (int i = 0; i < listCases.length; i++) {
             for (int j = 0; j < listCases[i].length; j++) {
-                listCases[i][j].setIsDiscovered(true);
+                listCases[i][j].setIsDiscovered(true, Color.LIGHT_GRAY);
+            }
+        }
+    }
+
+    List<Client> getClients() {
+        return this.clients;
+    }
+
+    public void endGameMultiplayer(App app, boolean wait, int scores[]) {
+        // Create and show the "Please Wait" dialog on the Event Dispatch Thread
+        if (wait) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pleaseWaitDialog = new JDialog((JFrame) null, "Please Wait", true);
+                    pleaseWaitDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                    pleaseWaitDialog.setSize(300, 150);
+                    pleaseWaitDialog.setLocationRelativeTo(null);
+                    pleaseWaitDialog.add(new JLabel("Please wait...", SwingConstants.CENTER));
+                    pleaseWaitDialog.setVisible(true);
+                }
+            });
+        } else {
+            if (pleaseWaitDialog != null) {
+                pleaseWaitDialog.dispose();
+            }
+
+            String[] options = { "Restart", "Exit" };
+            StringBuilder ranking = new StringBuilder("Classement : \n");
+
+            // transform the scores into a list of maps
+            Map<Integer, Integer> scoresList = new HashMap<>();
+            for (int i = 0; i < scores.length; i++) {
+                scoresList.put(i, scores[i]);
+            }
+
+            // sort the scores
+            SortedSet<Map.Entry<Integer, Integer>> scoresSorted = new TreeSet<Map.Entry<Integer, Integer>>(
+                    new Comparator<Map.Entry<Integer, Integer>>() {
+                        @Override
+                        public int compare(Map.Entry<Integer, Integer> e1, Map.Entry<Integer, Integer> e2) {
+                            return e2.getValue().compareTo(e1.getValue());
+                        }
+                    });
+            scoresSorted.addAll(scoresList.entrySet());
+
+            for (Map.Entry<Integer, Integer> entry : scoresSorted) {
+                ranking.append("Player ").append(entry.getKey() + 1).append(": ").append(entry.getValue()).append("\n");
+            }
+
+            // Show the custom dialog
+            int choice = JOptionPane.showOptionDialog(
+                    null,
+                    ranking.toString(),
+                    "Game Over",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            if (choice == 0) {
+                restartGame(app, "Facile");
+            } else if (choice == 1) {
+                System.exit(0);
             }
         }
     }

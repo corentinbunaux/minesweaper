@@ -113,4 +113,8 @@ public class Champ {
     public int getNbFlags() {
         return this.nbOfFlags;
     }
+
+    public void setField(int x, int y, int value) {
+        this.field[x][y] = value;
+    }
 }

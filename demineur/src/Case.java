@@ -3,6 +3,9 @@ import java.awt.Graphics;
 import java.awt.SystemTray;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import javax.swing.BorderFactory;
@@ -16,6 +19,7 @@ public class Case extends JPanel implements MouseListener {
     private App app;
     private int xCase;
     private int yCase;
+    private Color color;
 
     public Case() {
         setPreferredSize(new Dimension(DIM, DIM));
@@ -28,6 +32,7 @@ public class Case extends JPanel implements MouseListener {
         this.app = app;
         this.xCase = j;
         this.yCase = i;
+        this.color = Color.LIGHT_GRAY;
     }
 
     @Override
@@ -40,8 +45,7 @@ public class Case extends JPanel implements MouseListener {
         int y = (getHeight() + textHeight) / 2;
         g.drawString(txt, x, y);
         if (isDiscovered) {
-            setBackground(Color.LIGHT_GRAY);
-            setForeground(Color.BLUE);
+            setBackground(color);
             if (txt == "*") {
                 setBackground(Color.RED);
             }
@@ -52,8 +56,11 @@ public class Case extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (isDiscovered) {
+            return;
+        }
         if (e.getButton() == MouseEvent.BUTTON3) {
-            if (!isDiscovered & app.getChamp().getNbFlags() > 0) {
+            if (!isDiscovered & app.getChamp().getNbFlags() > 0 & app.getMultiplayerStatus() == false) {
                 if (txt != "F") {
                     txt = "F";
                     app.getChamp().decrementNbFlags();
@@ -63,14 +70,31 @@ public class Case extends JPanel implements MouseListener {
                 }
             }
         } else {
+
+            if (!app.getGameStarted()) {
+                this.app.getChamp().spawnMines(app.getChamp().getHeight(), app.getChamp().getWidth(), xCase, yCase);
+            }
+
+            handleClicMultiplayer(app, xCase, yCase);
+
             if (!app.getGameStarted()) {
                 app.setGameStarted(true);
-                this.app.getChamp().spawnMines(app.getChamp().getHeight(), app.getChamp().getWidth(), xCase, yCase);
+                if (app.getMultiplayerStatus() == false) {
+                    app.getGUI().getLabelScore().setGameStarted(true);
+                }
             }
 
             if (this.app.getChamp().getVal(xCase, yCase) == -1) {
                 txt = "*";
-                app.getGUI().endGame(this.app, false);
+                if (app.getMultiplayerStatus()) {
+                    Client client = app.getGUI().getClients().get(0);
+                    client.sendMessageToServer("endGame");
+                    client.sendIntToServer(app.getGUI().getClients().get(0).getPlayerNumber());
+
+                    app.getGUI().endGameMultiplayer(this.app, true, null);
+                } else {
+                    app.getGUI().endGame(this.app, false);
+                }
 
             } else {
                 if (this.app.getChamp().getVal(xCase, yCase) == 0) {
@@ -87,6 +111,9 @@ public class Case extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (isDiscovered) {
+            return;
+        }
         if (isDiscovered == false & e.getButton() != MouseEvent.BUTTON3) {
             isDiscovered = true;
             this.app.getChamp().downgradeNbRemainingSpots();
@@ -99,9 +126,28 @@ public class Case extends JPanel implements MouseListener {
         }
     }
 
+    void handleClicMultiplayer(App app, int xCase, int yCase) {
+        if (app.getGUI().getClients().size() > 0) {
+            Client client = app.getGUI().getClients().get(0);
+            client.sendMessageToServer("click");
+            client.sendIntToServer(xCase);
+            client.sendIntToServer(yCase);
+            client.sendIntToServer(client.getPlayerNumber());
+            client.sendIntToServer(app.getGameStarted() ? 1 : 0);
+
+            if (!app.getGameStarted()) {
+                for (int i = 0; i < app.getChamp().getHeight(); i++) {
+                    for (int j = 0; j < app.getChamp().getWidth(); j++) {
+                        client.sendIntToServer(app.getChamp().getVal(i, j));
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void mouseReleased(MouseEvent e) {
-        setBackground(Color.LIGHT_GRAY);
+        setBackground(color);
     }
 
     @Override
@@ -118,7 +164,7 @@ public class Case extends JPanel implements MouseListener {
         return this.isDiscovered;
     }
 
-    void setIsDiscovered(boolean val) {
+    void setIsDiscovered(boolean val, Color playerColor) {
         this.isDiscovered = val;
         if (app.getChamp().getVal(xCase, yCase) == 0) {
             txt = " ";
@@ -127,6 +173,14 @@ public class Case extends JPanel implements MouseListener {
         } else {
             txt = Integer.toString(app.getChamp().getVal(xCase, yCase));
         }
+
+        if (app.getMultiplayerStatus()) {
+            setColor(playerColor);
+        }
+    }
+
+    void setColor(Color color) {
+        this.color = color;
     }
 
     String getTxt() {

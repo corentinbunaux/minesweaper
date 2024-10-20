@@ -13,6 +13,7 @@ import javax.swing.border.Border;
 public class Compteur extends JLabel implements Runnable {
     private Thread processScores;
     private int score;
+    private boolean gameStarted = false;
 
     @Override
     public void paintComponent(Graphics g) {
@@ -27,11 +28,18 @@ public class Compteur extends JLabel implements Runnable {
         processScores.start();
     }
 
+    public void setGameStarted(boolean val) {
+        this.gameStarted = val;
+        System.out.println("Game started");
+    }
+
     public void run() {
         while (processScores != null) {
             try {
                 Thread.sleep(1000);
-                this.score++;
+                if (gameStarted) {
+                    this.score++;
+                }
                 afficheScore();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -43,7 +51,7 @@ public class Compteur extends JLabel implements Runnable {
         this.setText("Score : " + score);
     }
 
-    void reinitScore() {
+    public void reinitScore() {
         this.score = 0;
     }
 
